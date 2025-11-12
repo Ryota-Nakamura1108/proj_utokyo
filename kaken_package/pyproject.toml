@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kaken-info"
+version = "0.1.0"
+description = "科研費情報を研究者名でスクレイピングするCLIツール"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+# 依存関係
+dependencies = [
+    "pandas",
+    "selenium",
+    "webdriver-manager",
+    "beautifulsoup4",
+    "python-dotenv",
+    "requests",
+    "pyalex",
+    "openai",
+    "sentence-transformers",
+    "faiss-cpu",
+    "numpy",
+]
+
+[project.urls]
+Homepage = "https://github.com/example/kaken-info"
+
+# 要件3: CLIエントリーポイント (uv run kaken_info ... で kaken_info.cli:main を実行)
+[project.scripts]
+kaken_info = "kaken_info.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kaken_info"]

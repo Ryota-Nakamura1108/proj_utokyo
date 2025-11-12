@@ -1,0 +1,1 @@
+"""HTML reporting module for Central Researcher analysis."""

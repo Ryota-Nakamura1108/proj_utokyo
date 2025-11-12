@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central Researcher Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .advanced-options {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .advanced-toggle {
+            color: #667eea;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .advanced-toggle:hover {
+            text-decoration: underline;
+        }
+
+        .advanced-content {
+            display: none;
+        }
+
+        .advanced-content.show {
+            display: block;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-steps {
+            text-align: left;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .progress-step.active {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .progress-step.completed {
+            color: #4caf50;
+        }
+
+        .step-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .error {
+            display: none;
+            padding: 15px;
+            background: #fee;
+            border: 1px solid #fcc;
+            border-radius: 8px;
+            color: #c33;
+            margin-top: 20px;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .success {
+            display: none;
+            padding: 15px;
+            background: #efe;
+            border: 1px solid #cfc;
+            border-radius: 8px;
+            color: #3c3;
+            margin-top: 20px;
+        }
+
+        .success.show {
+            display: block;
+        }
+
+        .result-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .result-link:hover {
+            background: #5568d3;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Central Researcher Analysis</h1>
+        <p class="subtitle">研究者ネットワーク分析システム</p>
+
+        <div class="info-box">
+            📌 クエリを入力して、関連する研究者のランキングと詳細分析を取得できます。
+        </div>
+
+        <form id="analysisForm">
+            <div class="form-group">
+                <label for="query">研究クエリ *</label>
+                <input
+                    type="text"
+                    id="query"
+                    name="query"
+                    placeholder="例: quantum computing, machine learning, etc."
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email">メールアドレス *</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="your_email@example.com"
+                    required
+                >
+                <small style="color: #666; font-size: 12px;">OpenAlex APIの利用に必要です</small>
+            </div>
+
+            <div class="form-group">
+                <label for="institution">フィルタ機関（オプション）</label>
+                <input
+                    type="text"
+                    id="institution"
+                    name="institution"
+                    placeholder="例: The University of Tokyo（空欄の場合は全機関が対象）"
+                    value=""
+                >
+            </div>
+
+            <div class="advanced-options">
+                <span class="advanced-toggle" onclick="toggleAdvanced()">⚙️ 詳細オプション</span>
+                <div class="advanced-content" id="advancedContent">
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="top_k">取得論文数</label>
+                            <input
+                                type="number"
+                                id="top_k"
+                                name="top_k"
+                                value="100"
+                                min="10"
+                                max="500"
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="threshold">類似度閾値</label>
+                            <input
+                                type="number"
+                                id="threshold"
+                                name="threshold"
+                                value="0.55"
+                                step="0.05"
+                                min="0.1"
+                                max="1.0"
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">分析開始</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>分析を実行中です。数分かかる場合があります...</p>
+            <div class="progress-steps" id="progressSteps">
+                <div class="progress-step" id="step1">
+                    <span class="step-icon">⏳</span>
+                    <span>ステップ 1: 論文検索を実行中 (約30秒)</span>
+                </div>
+                <div class="progress-step" id="step2">
+                    <span class="step-icon">⏳</span>
+                    <span>ステップ 2: 著者データを取得中 (約1分)</span>
+                </div>
+                <div class="progress-step" id="step3">
+                    <span class="step-icon">⏳</span>
+                    <span>ステップ 3: 研究者ネットワークを構築中 (約30秒)</span>
+                </div>
+                <div class="progress-step" id="step4">
+                    <span class="step-icon">⏳</span>
+                    <span>ステップ 4: スコアを計算中 (約30秒)</span>
+                </div>
+                <div class="progress-step" id="step5">
+                    <span class="step-icon">⏳</span>
+                    <span>ステップ 5: 追加データを収集中 (約1分)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
+    </div>
+
+    <script>
+        // API URL - Direct Cloud Run (with CORS)
+        const API_URL = 'https://central-researcher-api-1008514239787.asia-northeast1.run.app';
+
+        function toggleAdvanced() {
+            const content = document.getElementById('advancedContent');
+            content.classList.toggle('show');
+        }
+
+        // Progress animation
+        let progressInterval;
+        function startProgressAnimation() {
+            const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
+            const timings = [30, 60, 30, 30, 60]; // seconds for each step
+            let currentStep = 0;
+            let elapsedTime = 0;
+
+            // Activate first step
+            document.getElementById(steps[0]).classList.add('active');
+
+            progressInterval = setInterval(() => {
+                elapsedTime += 5;
+
+                // Calculate total time for current step
+                let timeForCurrentStep = 0;
+                for (let i = 0; i <= currentStep; i++) {
+                    timeForCurrentStep += timings[i];
+                }
+
+                // Check if we should move to next step
+                if (elapsedTime >= timeForCurrentStep && currentStep < steps.length - 1) {
+                    // Complete current step
+                    const currentStepEl = document.getElementById(steps[currentStep]);
+                    currentStepEl.classList.remove('active');
+                    currentStepEl.classList.add('completed');
+                    currentStepEl.querySelector('.step-icon').textContent = '✓';
+
+                    // Move to next step
+                    currentStep++;
+                    document.getElementById(steps[currentStep]).classList.add('active');
+                }
+            }, 5000); // Update every 5 seconds
+        }
+
+        function stopProgressAnimation() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+            // Mark all as completed
+            ['step1', 'step2', 'step3', 'step4', 'step5'].forEach(stepId => {
+                const stepEl = document.getElementById(stepId);
+                stepEl.classList.remove('active');
+                stepEl.classList.add('completed');
+                stepEl.querySelector('.step-icon').textContent = '✓';
+            });
+        }
+
+        function resetProgressAnimation() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+            ['step1', 'step2', 'step3', 'step4', 'step5'].forEach(stepId => {
+                const stepEl = document.getElementById(stepId);
+                stepEl.classList.remove('active', 'completed');
+                stepEl.querySelector('.step-icon').textContent = '⏳';
+            });
+        }
+
+        document.getElementById('analysisForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // UI状態をリセット
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('error').classList.remove('show');
+            document.getElementById('success').classList.remove('show');
+            document.getElementById('submitBtn').disabled = true;
+
+            // Reset and start progress animation
+            resetProgressAnimation();
+            startProgressAnimation();
+
+            // フォームデータを取得
+            const formData = {
+                query: document.getElementById('query').value,
+                email: document.getElementById('email').value,
+                filter_institution: document.getElementById('institution').value,
+                top_k: parseInt(document.getElementById('top_k').value),
+                similarity_threshold: parseFloat(document.getElementById('threshold').value)
+            };
+
+            try {
+                // API呼び出し
+                const response = await fetch(`${API_URL}/api/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    // Stop progress animation and mark as completed
+                    stopProgressAnimation();
+
+                    // 成功時の処理
+                    const data = result.data;
+                    const successDiv = document.getElementById('success');
+
+                    successDiv.innerHTML = `
+                        <h3>✅ 分析完了</h3>
+                        <p><strong>検索クエリ:</strong> ${data.query}</p>
+                        <p><strong>論文数:</strong> ${data.total_papers}件</p>
+                        <p><strong>研究者数:</strong> ${data.total_researchers}名</p>
+                        <p><strong>トップ研究者:</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            ${data.rankings.slice(0, 5).map(r =>
+                                `<li>${r.rank}. ${r.author_name} (CRS: ${r.crs_score.toFixed(4)})</li>`
+                            ).join('')}
+                        </ul>
+                        <a href="results.html?query=${encodeURIComponent(data.query)}" class="result-link">
+                            詳細レポートを表示
+                        </a>
+                    `;
+                    successDiv.classList.add('show');
+
+                    // ローカルストレージに結果を保存
+                    localStorage.setItem('lastAnalysisResult', JSON.stringify(result.data));
+                } else {
+                    // エラー時の処理
+                    throw new Error(result.error || '不明なエラーが発生しました');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                stopProgressAnimation();  // Stop animation on error
+                const errorDiv = document.getElementById('error');
+                errorDiv.textContent = `エラー: ${error.message}`;
+                errorDiv.classList.add('show');
+            } finally {
+                // UI状態を元に戻す
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('submitBtn').disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

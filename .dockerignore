@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Documentation
+*.md
+docs/
+
+# Output files (これらは実行時に生成される)
+output/
+*.html
+*.csv
+
+# Vector data - Dockerイメージに含める（起動高速化のため）
+# article_search/vectors/
+# **/vectors/*.h5
+# **/vectors/*.pkl
+
+# Firebase
+.firebase/
+.firebaserc
+firebase.json
+public/
+
+# Tests
+tests/
+test_*.py
+*_test.py
+
+# Environment
+.env
+.env.local
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
