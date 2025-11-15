@@ -260,10 +260,10 @@
 
             if (data.network_statistics) {
                 document.getElementById('networkNodes').textContent =
-                    data.network_statistics.total_nodes || '-';
+                    data.network_statistics.num_nodes || '-';
                 document.getElementById('avgClustering').textContent =
-                    data.network_statistics.average_clustering ?
-                    data.network_statistics.average_clustering.toFixed(3) : '-';
+                    data.network_statistics.avg_clustering ?
+                    data.network_statistics.avg_clustering.toFixed(3) : '-';
             }
 
             // ランキングを表示
