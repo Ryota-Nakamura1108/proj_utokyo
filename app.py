@@ -16,11 +16,19 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 try:
-    from article_search.core.article_search_faiss import PaperSearchEngineFAISS, SearchResults, SearchResult
-    PaperSearchEngine = PaperSearchEngineFAISS  # Use FAISS version
+    from article_search.core.article_search_faiss_gcsfuse import PaperSearchEngineFAISSGCSFuse, SearchResults, SearchResult
+    # Initialize search engine globally on startup (downloads FAISS index once)
+    logger.info("Initializing PaperSearchEngine globally...")
+    PaperSearchEngine = PaperSearchEngineFAISSGCSFuse()
+    logger.info("✅ PaperSearchEngine initialized successfully")
 except ImportError as e:
     logger.error(f"エラー: {e}")
     logger.error(f"このスクリプトと同じディレクトリ ({BASE_DIR}) に配置してください。")
+    PaperSearchEngine = None
+    SearchResults = None
+    SearchResult = None
+except Exception as e:
+    logger.error(f"PaperSearchEngine initialization failed: {e}")
     PaperSearchEngine = None
     SearchResults = None
     SearchResult = None
@@ -370,8 +378,8 @@ async def run_combined_analysis(
         if not PaperSearchEngine:
             raise Exception("PaperSearchEngine がインポートされていません")
 
-        search_engine = PaperSearchEngine(index_dir=FAISS_INDEX_DIR)
-        search_results: SearchResults = search_engine.search(
+        # Use globally initialized search engine (no re-initialization)
+        search_results: SearchResults = PaperSearchEngine.search(
             query=query,
             top_k=top_k,
             similarity_threshold=similarity_threshold
@@ -501,18 +509,48 @@ async def run_combined_analysis(
 
 @app.route('/', methods=['GET'])
 def index():
-    """Root endpoint - API information"""
-    return jsonify({
-        'service': 'Central Researcher API',
-        'version': '1.0.0',
-        'status': 'running',
-        'endpoints': {
-            'health': '/api/health',
-            'analyze': '/api/analyze (POST)',
-            'researcher_details': '/api/researchers/<researcher_id> (GET)'
-        },
-        'documentation': 'Access API endpoints under /api/'
-    })
+    """Root endpoint - Serve front page"""
+    try:
+        index_path = os.path.join(BASE_DIR, 'public', 'index.html')
+        return send_file(index_path)
+    except Exception as e:
+        logger.error(f"Error serving index.html: {e}")
+        # Fallback to API information
+        return jsonify({
+            'service': 'Central Researcher API',
+            'version': '1.0.0',
+            'status': 'running',
+            'endpoints': {
+                'health': '/api/health',
+                'analyze': '/api/analyze (POST)',
+                'researcher_details': '/api/researchers/<researcher_id> (GET)'
+            },
+            'documentation': 'Access API endpoints under /api/'
+        })
+
+
+@app.route('/results.html', methods=['GET'])
+def results():
+    """Serve results page"""
+    try:
+        results_path = os.path.join(BASE_DIR, 'public', 'results.html')
+        return send_file(results_path)
+    except Exception as e:
+        logger.error(f"Error serving results.html: {e}")
+        return jsonify({'error': 'Results page not found'}), 404
+
+
+@app.route('/debug/files', methods=['GET'])
+def debug_files():
+    """Debug endpoint to list files in /app"""
+    import glob
+    files = {
+        'base_dir': BASE_DIR,
+        'public_exists': os.path.exists(os.path.join(BASE_DIR, 'public')),
+        'public_files': glob.glob(os.path.join(BASE_DIR, 'public', '*')) if os.path.exists(os.path.join(BASE_DIR, 'public')) else [],
+        'app_files': glob.glob(os.path.join(BASE_DIR, '*'))[:20]
+    }
+    return jsonify(files)
 
 
 @app.route('/api/health', methods=['GET'])

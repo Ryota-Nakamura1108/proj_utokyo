@@ -37,19 +37,23 @@ docs/
 
 # Output files (これらは実行時に生成される)
 output/
-*.html
+output/**/*.html
 *.csv
 
-# Vector data - Dockerイメージに含める（起動高速化のため）
-# article_search/vectors/
-# **/vectors/*.h5
-# **/vectors/*.pkl
+# Vector data - GCSからダウンロードするため除外
+article_search/vectors/
+**/vectors/*.h5
+**/vectors/*.pkl
+
+# FAISS index - GCSからダウンロードするため除外
+faiss_index/
+**/*.index
+**/*.parquet
 
 # Firebase
 .firebase/
 .firebaserc
 firebase.json
-public/
 
 # Tests
 tests/
