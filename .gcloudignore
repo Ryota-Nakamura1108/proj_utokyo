@@ -38,7 +38,7 @@ docs/
 
 # Output files
 output/
-*.html
+output/**/*.html
 *.csv
 
 # Large data files (Cloud Storageから取得するため除外) - これが最重要！
@@ -63,7 +63,6 @@ faiss_index/**
 .firebase/
 .firebaserc
 firebase.json
-public/
 
 # Tests
 tests/
