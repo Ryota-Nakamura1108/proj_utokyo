@@ -1,0 +1,89 @@
+# This file specifies files that are *not* uploaded to Google Cloud
+# using gcloud. It follows the same syntax as .gitignore, with the addition of
+# "#!include" directives (which insert the entries of the given .gitignore-style
+# file at that point).
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+
+# Output files
+output/
+output/**/*.html
+*.csv
+
+# Large data files (Cloud Storageから取得するため除外) - これが最重要！
+# Papers directory (生データ、18GB)
+papers
+papers/
+papers/**
+
+# Vector data files only (exclude .h5 and .pkl files, but include Python code)
+*.h5
+*.pkl
+
+# Vectors directory (already in GCS, no need to upload)
+article_search/vectors/
+article_search/vectors/**
+
+# FAISS index directory (will be mounted from GCS)
+faiss_index/
+faiss_index/**
+
+# Firebase
+.firebase/
+.firebaserc
+firebase.json
+
+# Tests
+tests/
+test_*.py
+*_test.py
+
+# Environment
+.env
+.env.local
+*.env
+.env.gcs
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Scripts (not needed in build)
+setup_cloud_storage.sh
+deploy.sh
+deploy_cloudbuilder.sh

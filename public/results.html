@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分析結果 - Central Researcher Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .rankings-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .rankings-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .researcher-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .researcher-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .researcher-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .researcher-rank {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            min-width: 50px;
+        }
+
+        .researcher-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            flex-grow: 1;
+            margin-left: 20px;
+        }
+
+        .researcher-crs {
+            font-size: 20px;
+            font-weight: 700;
+            color: #764ba2;
+        }
+
+        .researcher-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .institutions {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 分析結果</h1>
+        <p id="queryInfo"></p>
+        <a href="index.html" class="back-link">← 新しい分析</a>
+    </div>
+
+    <div class="container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>データを読み込んでいます...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>論文数</h3>
+                    <div class="stat-value" id="totalPapers">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>研究者数</h3>
+                    <div class="stat-value" id="totalResearchers">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>ネットワークノード数</h3>
+                    <div class="stat-value" id="networkNodes">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>平均クラスタリング係数</h3>
+                    <div class="stat-value" id="avgClustering">-</div>
+                </div>
+            </div>
+
+            <div class="rankings-section">
+                <h2>🏆 研究者ランキング Top 20</h2>
+                <div id="rankings"></div>
+            </div>
+        </div>
+
+        <div id="noData" class="no-data" style="display: none;">
+            <h2>データがありません</h2>
+            <p>まず分析を実行してください。</p>
+            <a href="index.html" class="back-link">分析ページへ</a>
+        </div>
+    </div>
+
+    <script>
+        // URLパラメータから取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('query');
+
+        // ローカルストレージからデータを取得
+        const data = JSON.parse(localStorage.getItem('lastAnalysisResult'));
+
+        if (data) {
+            displayResults(data);
+        } else {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('noData').style.display = 'block';
+        }
+
+        function displayResults(data) {
+            // クエリ情報を表示
+            document.getElementById('queryInfo').textContent =
+                `クエリ: "${data.query}" | 機関: ${data.filter_institution}`;
+
+            // 統計情報を表示
+            document.getElementById('totalPapers').textContent = data.total_papers;
+            document.getElementById('totalResearchers').textContent = data.total_researchers;
+
+            if (data.network_statistics) {
+                document.getElementById('networkNodes').textContent =
+                    data.network_statistics.num_nodes || '-';
+                document.getElementById('avgClustering').textContent =
+                    data.network_statistics.avg_clustering ?
+                    data.network_statistics.avg_clustering.toFixed(3) : '-';
+            }
+
+            // ランキングを表示
+            const rankingsHtml = data.rankings.map(r => `
+                <div class="researcher-card">
+                    <div class="researcher-header">
+                        <div class="researcher-rank">#${r.rank}</div>
+                        <div class="researcher-name">${r.author_name}</div>
+                        <div class="researcher-crs">CRS: ${r.crs_score.toFixed(4)}</div>
+                    </div>
+                    <div class="researcher-metrics">
+                        <div class="metric">
+                            <div class="metric-label">h-index</div>
+                            <div class="metric-value">${r.h_index}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">論文数</div>
+                            <div class="metric-value">${r.papers_in_corpus}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">リーダーシップ率</div>
+                            <div class="metric-value">${(r.leadership_rate * 100).toFixed(1)}%</div>
+                        </div>
+                    </div>
+                    ${r.institutions && r.institutions.length > 0 ? `
+                        <div class="institutions">
+                            🏛️ ${r.institutions.join(', ')}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+
+            document.getElementById('rankings').innerHTML = rankingsHtml;
+
+            // コンテンツを表示
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
